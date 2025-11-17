@@ -75,9 +75,9 @@ class GmailReader:
             logger.error(f"Gmail authentication failed: {str(e)}")
             raise
     
-    def get_unread_emails(self, max_results=100):
+    def get_all_emails(self, max_results=500):
         """
-        Get list of unread email IDs.
+        Get list of all email IDs (read and unread) from inbox.
         
         Args:
             max_results: Maximum number of emails to retrieve
@@ -89,15 +89,106 @@ class GmailReader:
             if not self.service:
                 raise RuntimeError("Gmail service not initialized. Call authenticate() first.")
             
-            # Query for unread emails
+            logger.info(f"Fetching all emails from inbox (max {max_results})...")
+            
+            # Query for all emails in inbox (read and unread)
             results = self.service.users().messages().list(
                 userId='me',
-                q='is:unread',
+                q='in:inbox -is:sent',
                 maxResults=max_results
             ).execute()
             
             messages = results.get('messages', [])
-            logger.info(f"Found {len(messages)} unread emails")
+            
+            # Handle pagination if there are more results
+            while 'nextPageToken' in results and len(messages) < max_results:
+                page_token = results['nextPageToken']
+                results = self.service.users().messages().list(
+                    userId='me',
+                    q='in:inbox -is:sent',
+                    maxResults=max_results,
+                    pageToken=page_token
+                ).execute()
+                messages.extend(results.get('messages', []))
+                if len(messages) >= max_results:
+                    messages = messages[:max_results]
+                    break
+            
+            logger.info(f"Found {len(messages)} emails in inbox (read and unread)")
+            return [msg['id'] for msg in messages]
+            
+        except HttpError as e:
+            logger.error(f"Error fetching all emails: {str(e)}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error getting all emails: {str(e)}")
+            raise
+    
+    def get_unread_emails(self, max_results=100, fallback_to_recent=False):
+        """
+        Get list of unread email IDs.
+        
+        Args:
+            max_results: Maximum number of emails to retrieve
+            fallback_to_recent: If True, fallback to recent emails if no unread found
+            
+        Returns:
+            List of email message IDs
+        """
+        try:
+            if not self.service:
+                raise RuntimeError("Gmail service not initialized. Call authenticate() first.")
+            
+            # Try multiple query strategies
+            queries = [
+                'is:unread in:inbox',  # Unread emails in inbox
+                'is:unread',  # All unread emails
+                'in:inbox is:unread -is:sent',  # Unread in inbox, not sent
+            ]
+            
+            messages = []
+            for query in queries:
+                try:
+                    logger.debug(f"Trying query: {query}")
+                    results = self.service.users().messages().list(
+                        userId='me',
+                        q=query,
+                        maxResults=max_results
+                    ).execute()
+                    
+                    found_messages = results.get('messages', [])
+                    logger.debug(f"Query '{query}' returned {len(found_messages)} messages")
+                    
+                    if found_messages:
+                        messages = found_messages
+                        logger.info(f"Found {len(messages)} unread emails using query: {query}")
+                        break
+                except Exception as e:
+                    logger.debug(f"Query '{query}' failed: {str(e)}")
+                    continue
+            
+            # If still no messages and fallback is enabled, try getting recent emails from inbox
+            if not messages and fallback_to_recent:
+                logger.info("No unread emails found. Trying to get recent emails from inbox as fallback...")
+                try:
+                    results = self.service.users().messages().list(
+                        userId='me',
+                        q='in:inbox -is:sent',
+                        maxResults=min(max_results, 10)  # Limit to 10 for fallback
+                    ).execute()
+                    recent_messages = results.get('messages', [])
+                    if recent_messages:
+                        messages = recent_messages
+                        logger.warning(f"Using {len(messages)} recent emails from inbox (may not be unread) as fallback")
+                        logger.warning("These emails will be processed but NOT marked as read")
+                    else:
+                        logger.info("No recent emails found in inbox either")
+                except Exception as e:
+                    logger.debug(f"Failed to get recent emails: {str(e)}")
+            elif not messages:
+                logger.info("No unread emails found. Set fallback_to_recent=True to process recent emails.")
+            
+            logger.info(f"Returning {len(messages)} email IDs")
             return [msg['id'] for msg in messages]
             
         except HttpError as e:

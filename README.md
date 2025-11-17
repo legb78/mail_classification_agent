@@ -68,16 +68,12 @@ Edit `.env` and fill in:
 - `SHEETS_CREDENTIALS_FILE`: Path to Sheets OAuth credentials
 - `SPREADSHEET_ID`: Your Google Sheets spreadsheet ID
 - `BATCH_SIZE`: Number of emails to process per batch (default: 20)
+- `PROCESS_ALL_EMAILS`: Set to `true` to process all emails (read and unread), `false` for unread only (default: false)
+- `MAX_EMAILS_TO_PROCESS`: Maximum emails to process when `PROCESS_ALL_EMAILS=true` (default: 500)
 
 6. Prepare Google Sheets:
    - Create a Google Sheets spreadsheet
-   - Create 5 sheets with these exact names:
-     - `Technique`
-     - `Administratif`
-     - `Accès/Authentification`
-     - `Support utilisateur`
-     - `Bug/Dysfonctionnement`
-   - Each sheet should have headers in row 1: `Sujet`, `Urgence`, `Synthèse`
+   - The script will automatically create a sheet named "Tickets" with headers: `Sujet`, `Catégorie`, `Urgence`, `Synthèse`
    - Copy the spreadsheet ID from the URL (the long string between `/d/` and `/edit`)
 
 ## Usage
@@ -95,11 +91,15 @@ After authorization, tokens will be saved and reused automatically.
 
 ## How It Works
 
-1. **Email Reading**: Reads all unread emails from Gmail inbox
+1. **Email Reading**: 
+   - By default: Reads unread emails from Gmail inbox
+   - If `PROCESS_ALL_EMAILS=true`: Reads all emails (read and unread) from inbox
 2. **AI Analysis**: Sends each email (subject + body) to Groq API for analysis
 3. **Classification**: Groq returns category, urgency level, and summary
-4. **Sheet Writing**: Writes results to the appropriate category sheet
-5. **Email Marking**: Marks processed emails as read (only after successful sheet write)
+4. **Sheet Writing**: Writes all results to a single "Tickets" sheet with columns: Sujet, Catégorie, Urgence, Synthèse
+5. **Email Marking**: 
+   - Marks processed emails as read only if processing unread emails
+   - Skips marking as read when processing all emails (to avoid marking already-read emails)
 
 ## Logging
 

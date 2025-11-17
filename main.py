@@ -106,15 +106,26 @@ def main():
         logger.info("Verifying Google Sheets structure...")
         sheets_writer.verify_sheets_exist()
         
-        # Get unread emails
-        logger.info("Fetching unread emails...")
-        email_ids = gmail_reader.get_unread_emails(max_results=100)
+        # Get emails based on configuration
+        process_all_emails = os.getenv('PROCESS_ALL_EMAILS', 'false').lower() == 'true'
+        
+        if process_all_emails:
+            logger.info("Processing ALL emails (read and unread)...")
+            max_emails = int(os.getenv('MAX_EMAILS_TO_PROCESS', '500'))
+            email_ids = gmail_reader.get_all_emails(max_results=max_emails)
+            mark_as_read = False  # Don't mark as read when processing all emails
+        else:
+            logger.info("Fetching unread emails only...")
+            fallback_to_recent = os.getenv('FALLBACK_TO_RECENT', 'false').lower() == 'true'
+            email_ids = gmail_reader.get_unread_emails(max_results=100, fallback_to_recent=fallback_to_recent)
+            mark_as_read = not fallback_to_recent  # Only mark as read if not using fallback
         
         if not email_ids:
-            logger.info("No unread emails found. Exiting.")
+            logger.info("No emails found. Exiting.")
+            logger.info("Tip: Set PROCESS_ALL_EMAILS=true in .env to process all emails (read and unread)")
             return
         
-        logger.info(f"Found {len(email_ids)} unread emails to process")
+        logger.info(f"Found {len(email_ids)} emails to process")
         
         # Process emails in batches
         batch_size = config['batch_size']
@@ -179,15 +190,19 @@ def main():
                 total_failed += len(results_to_write)
                 continue
             
-            # Mark emails as read (only after successful sheet write)
-            logger.info(f"Marking {len(results_to_write)} emails as read...")
-            for result in results_to_write:
-                try:
-                    gmail_reader.mark_as_read(result['email_id'])
-                    total_processed += 1
-                except Exception as e:
-                    logger.error(f"Failed to mark email {result['email_id']} as read: {str(e)}")
-                    # Don't count as failed since it was already written to sheets
+            # Mark emails as read (only after successful sheet write and only if configured)
+            if mark_as_read:
+                logger.info(f"Marking {len(results_to_write)} emails as read...")
+                for result in results_to_write:
+                    try:
+                        gmail_reader.mark_as_read(result['email_id'])
+                        total_processed += 1
+                    except Exception as e:
+                        logger.error(f"Failed to mark email {result['email_id']} as read: {str(e)}")
+                        # Don't count as failed since it was already written to sheets
+            else:
+                logger.info(f"Skipping mark-as-read (processing all emails or fallback mode)")
+                total_processed += len(results_to_write)
         
         # Summary
         logger.info("=" * 60)

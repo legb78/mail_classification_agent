@@ -17,14 +17,8 @@ logger = logging.getLogger(__name__)
 # Google Sheets API scopes
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-# Category to sheet name mapping
-CATEGORY_SHEET_MAP = {
-    'Technique': 'Technique',
-    'Administratif': 'Administratif',
-    'Accès/Authentification': 'Accès/Authentification',
-    'Support utilisateur': 'Support utilisateur',
-    'Bug/Dysfonctionnement': 'Bug/Dysfonctionnement'
-}
+# Single sheet name for all tickets
+TICKETS_SHEET_NAME = 'Tickets'
 
 
 class SheetsWriter:
@@ -87,10 +81,8 @@ class SheetsWriter:
     
     def verify_sheets_exist(self):
         """
-        Verify that all required category sheets exist in the spreadsheet.
-        
-        Raises:
-            ValueError: If any required sheet is missing
+        Verify that the tickets sheet exists in the spreadsheet.
+        Creates it automatically if missing.
         """
         try:
             if not self.service:
@@ -104,19 +96,16 @@ class SheetsWriter:
             existing_sheets = [sheet['properties']['title'] for sheet in spreadsheet.get('sheets', [])]
             logger.info(f"Found sheets: {', '.join(existing_sheets)}")
             
-            # Check for required sheets
-            missing_sheets = []
-            for category, sheet_name in CATEGORY_SHEET_MAP.items():
-                if sheet_name not in existing_sheets:
-                    missing_sheets.append(sheet_name)
+            # Check if tickets sheet exists and create if missing
+            if TICKETS_SHEET_NAME not in existing_sheets:
+                logger.info(f"Creating missing sheet: {TICKETS_SHEET_NAME}")
+                self._create_sheets([TICKETS_SHEET_NAME])
+                logger.info(f"Successfully created sheet '{TICKETS_SHEET_NAME}'")
             
-            if missing_sheets:
-                raise ValueError(
-                    f"Missing required sheets: {', '.join(missing_sheets)}\n"
-                    f"Please create these sheets in your spreadsheet: {', '.join(missing_sheets)}"
-                )
+            # Verify headers exist in the sheet
+            self._ensure_headers()
             
-            logger.info("All required sheets verified")
+            logger.info("Tickets sheet verified and ready")
             
         except HttpError as e:
             logger.error(f"Error verifying sheets: {str(e)}")
@@ -125,12 +114,80 @@ class SheetsWriter:
             logger.error(f"Unexpected error verifying sheets: {str(e)}")
             raise
     
-    def write_result(self, category: str, subject: str, urgency: str, summary: str):
+    def _create_sheets(self, sheet_names):
         """
-        Write a single result row to the appropriate category sheet.
+        Create new sheets in the spreadsheet.
         
         Args:
-            category: Email category (must match CATEGORY_SHEET_MAP)
+            sheet_names: List of sheet names to create
+        """
+        try:
+            requests = []
+            for sheet_name in sheet_names:
+                requests.append({
+                    'addSheet': {
+                        'properties': {
+                            'title': sheet_name
+                        }
+                    }
+                })
+            
+            body = {
+                'requests': requests
+            }
+            
+            self.service.spreadsheets().batchUpdate(
+                spreadsheetId=self.spreadsheet_id,
+                body=body
+            ).execute()
+            
+            logger.info(f"Created sheets: {', '.join(sheet_names)}")
+            
+        except HttpError as e:
+            logger.error(f"Error creating sheets: {str(e)}")
+            raise
+    
+    def _ensure_headers(self):
+        """
+        Ensure that the tickets sheet has the required headers.
+        """
+        try:
+            headers = ['Sujet', 'Catégorie', 'Urgence', 'Synthèse']
+            
+            # Check if headers exist
+            range_name = f"{TICKETS_SHEET_NAME}!A1:D1"
+            result = self.service.spreadsheets().values().get(
+                spreadsheetId=self.spreadsheet_id,
+                range=range_name
+            ).execute()
+            
+            values = result.get('values', [])
+            
+            # If no headers or headers don't match, add them
+            if not values or values[0] != headers:
+                body = {
+                    'values': [headers]
+                }
+                self.service.spreadsheets().values().update(
+                    spreadsheetId=self.spreadsheet_id,
+                    range=range_name,
+                    valueInputOption='RAW',
+                    body=body
+                ).execute()
+                logger.info(f"Added headers to sheet '{TICKETS_SHEET_NAME}'")
+            else:
+                logger.debug(f"Headers already exist in sheet '{TICKETS_SHEET_NAME}'")
+                    
+        except HttpError as e:
+            logger.error(f"Error ensuring headers: {str(e)}")
+            raise
+    
+    def write_result(self, category: str, subject: str, urgency: str, summary: str):
+        """
+        Write a single result row to the tickets sheet.
+        
+        Args:
+            category: Email category
             subject: Email subject
             urgency: Urgency level
             summary: Email summary
@@ -139,16 +196,11 @@ class SheetsWriter:
             if not self.service:
                 raise RuntimeError("Sheets service not initialized. Call authenticate() first.")
             
-            # Get sheet name for category
-            sheet_name = CATEGORY_SHEET_MAP.get(category)
-            if not sheet_name:
-                raise ValueError(f"Unknown category: {category}")
-            
-            # Prepare row data
-            row_data = [subject, urgency, summary]
+            # Prepare row data with category included
+            row_data = [subject, category, urgency, summary]
             
             # Find next empty row
-            range_name = f"{sheet_name}!A:A"
+            range_name = f"{TICKETS_SHEET_NAME}!A:A"
             result = self.service.spreadsheets().values().get(
                 spreadsheetId=self.spreadsheet_id,
                 range=range_name
@@ -158,7 +210,7 @@ class SheetsWriter:
             next_row = len(values) + 1
             
             # Write data
-            range_to_update = f"{sheet_name}!A{next_row}:C{next_row}"
+            range_to_update = f"{TICKETS_SHEET_NAME}!A{next_row}:D{next_row}"
             body = {
                 'values': [row_data]
             }
@@ -170,7 +222,7 @@ class SheetsWriter:
                 body=body
             ).execute()
             
-            logger.info(f"Written to {sheet_name}: {subject[:50]}...")
+            logger.info(f"Written to {TICKETS_SHEET_NAME}: {subject[:50]}... ({category})")
             
         except HttpError as e:
             logger.error(f"Error writing to sheet: {str(e)}")
@@ -181,7 +233,7 @@ class SheetsWriter:
     
     def write_batch(self, results: list):
         """
-        Write multiple results to their respective sheets.
+        Write multiple results to the tickets sheet.
         
         Args:
             results: List of result dictionaries with 'categorie', 'subject', 'urgence', 'synthese'
@@ -190,54 +242,44 @@ class SheetsWriter:
             if not self.service:
                 raise RuntimeError("Sheets service not initialized. Call authenticate() first.")
             
-            # Group results by category
-            by_category = {}
-            for result in results:
-                category = result.get('categorie', 'Support utilisateur')
-                if category not in by_category:
-                    by_category[category] = []
-                by_category[category].append(result)
+            if not results:
+                logger.warning("No results to write")
+                return
             
-            # Write each category's results
-            for category, category_results in by_category.items():
-                sheet_name = CATEGORY_SHEET_MAP.get(category)
-                if not sheet_name:
-                    logger.warning(f"Unknown category '{category}', skipping")
-                    continue
-                
-                # Prepare batch data
-                rows_data = []
-                for result in category_results:
-                    rows_data.append([
-                        result.get('subject', ''),
-                        result.get('urgence', ''),
-                        result.get('synthese', '')
-                    ])
-                
-                # Find next empty row
-                range_name = f"{sheet_name}!A:A"
-                result_get = self.service.spreadsheets().values().get(
-                    spreadsheetId=self.spreadsheet_id,
-                    range=range_name
-                ).execute()
-                
-                values = result_get.get('values', [])
-                start_row = len(values) + 1
-                
-                # Write batch
-                range_to_update = f"{sheet_name}!A{start_row}:C{start_row + len(rows_data) - 1}"
-                body = {
-                    'values': rows_data
-                }
-                
-                self.service.spreadsheets().values().update(
-                    spreadsheetId=self.spreadsheet_id,
-                    range=range_to_update,
-                    valueInputOption='RAW',
-                    body=body
-                ).execute()
-                
-                logger.info(f"Written {len(rows_data)} rows to {sheet_name}")
+            # Prepare batch data with category included
+            rows_data = []
+            for result in results:
+                rows_data.append([
+                    result.get('subject', ''),
+                    result.get('categorie', 'Support utilisateur'),
+                    result.get('urgence', ''),
+                    result.get('synthese', '')
+                ])
+            
+            # Find next empty row
+            range_name = f"{TICKETS_SHEET_NAME}!A:A"
+            result_get = self.service.spreadsheets().values().get(
+                spreadsheetId=self.spreadsheet_id,
+                range=range_name
+            ).execute()
+            
+            values = result_get.get('values', [])
+            start_row = len(values) + 1
+            
+            # Write batch
+            range_to_update = f"{TICKETS_SHEET_NAME}!A{start_row}:D{start_row + len(rows_data) - 1}"
+            body = {
+                'values': rows_data
+            }
+            
+            self.service.spreadsheets().values().update(
+                spreadsheetId=self.spreadsheet_id,
+                range=range_to_update,
+                valueInputOption='RAW',
+                body=body
+            ).execute()
+            
+            logger.info(f"Written {len(rows_data)} rows to {TICKETS_SHEET_NAME}")
             
         except HttpError as e:
             logger.error(f"Error writing batch to sheets: {str(e)}")
