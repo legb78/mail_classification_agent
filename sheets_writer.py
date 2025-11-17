@@ -17,8 +17,14 @@ logger = logging.getLogger(__name__)
 # Google Sheets API scopes
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-# Single sheet name for all tickets
-TICKETS_SHEET_NAME = 'Tickets'
+# Urgency to sheet name mapping
+URGENCY_SHEET_MAP = {
+    'Critique': 'Critique',
+    'Élevée': 'Élevée',
+    'Modérée': 'Modérée',
+    'Faible': 'Faible',
+    'Anodine': 'Anodine'
+}
 
 
 class SheetsWriter:
@@ -81,8 +87,8 @@ class SheetsWriter:
     
     def verify_sheets_exist(self):
         """
-        Verify that the tickets sheet exists in the spreadsheet.
-        Creates it automatically if missing.
+        Verify that all required urgency sheets exist in the spreadsheet.
+        Creates missing sheets automatically.
         """
         try:
             if not self.service:
@@ -96,16 +102,21 @@ class SheetsWriter:
             existing_sheets = [sheet['properties']['title'] for sheet in spreadsheet.get('sheets', [])]
             logger.info(f"Found sheets: {', '.join(existing_sheets)}")
             
-            # Check if tickets sheet exists and create if missing
-            if TICKETS_SHEET_NAME not in existing_sheets:
-                logger.info(f"Creating missing sheet: {TICKETS_SHEET_NAME}")
-                self._create_sheets([TICKETS_SHEET_NAME])
-                logger.info(f"Successfully created sheet '{TICKETS_SHEET_NAME}'")
+            # Check for required urgency sheets and create missing ones
+            missing_sheets = []
+            for urgency, sheet_name in URGENCY_SHEET_MAP.items():
+                if sheet_name not in existing_sheets:
+                    missing_sheets.append(sheet_name)
             
-            # Verify headers exist in the sheet
+            if missing_sheets:
+                logger.info(f"Creating missing sheets: {', '.join(missing_sheets)}")
+                self._create_sheets(missing_sheets)
+                logger.info(f"Successfully created {len(missing_sheets)} sheet(s)")
+            
+            # Verify headers exist in each sheet
             self._ensure_headers()
             
-            logger.info("Tickets sheet verified and ready")
+            logger.info("All required urgency sheets verified and ready")
             
         except HttpError as e:
             logger.error(f"Error verifying sheets: {str(e)}")
@@ -149,34 +160,35 @@ class SheetsWriter:
     
     def _ensure_headers(self):
         """
-        Ensure that the tickets sheet has the required headers.
+        Ensure that each urgency sheet has the required headers.
         """
         try:
-            headers = ['Sujet', 'Catégorie', 'Urgence', 'Synthèse']
+            headers = ['Sujet', 'Catégorie', 'Synthèse']
             
-            # Check if headers exist
-            range_name = f"{TICKETS_SHEET_NAME}!A1:D1"
-            result = self.service.spreadsheets().values().get(
-                spreadsheetId=self.spreadsheet_id,
-                range=range_name
-            ).execute()
-            
-            values = result.get('values', [])
-            
-            # If no headers or headers don't match, add them
-            if not values or values[0] != headers:
-                body = {
-                    'values': [headers]
-                }
-                self.service.spreadsheets().values().update(
+            for urgency, sheet_name in URGENCY_SHEET_MAP.items():
+                # Check if headers exist
+                range_name = f"{sheet_name}!A1:C1"
+                result = self.service.spreadsheets().values().get(
                     spreadsheetId=self.spreadsheet_id,
-                    range=range_name,
-                    valueInputOption='RAW',
-                    body=body
+                    range=range_name
                 ).execute()
-                logger.info(f"Added headers to sheet '{TICKETS_SHEET_NAME}'")
-            else:
-                logger.debug(f"Headers already exist in sheet '{TICKETS_SHEET_NAME}'")
+                
+                values = result.get('values', [])
+                
+                # If no headers or headers don't match, add them
+                if not values or values[0] != headers:
+                    body = {
+                        'values': [headers]
+                    }
+                    self.service.spreadsheets().values().update(
+                        spreadsheetId=self.spreadsheet_id,
+                        range=range_name,
+                        valueInputOption='RAW',
+                        body=body
+                    ).execute()
+                    logger.info(f"Added headers to sheet '{sheet_name}'")
+                else:
+                    logger.debug(f"Headers already exist in sheet '{sheet_name}'")
                     
         except HttpError as e:
             logger.error(f"Error ensuring headers: {str(e)}")
@@ -184,23 +196,36 @@ class SheetsWriter:
     
     def write_result(self, category: str, subject: str, urgency: str, summary: str):
         """
-        Write a single result row to the tickets sheet.
+        Write a single result row to the appropriate urgency sheet.
         
         Args:
             category: Email category
             subject: Email subject
-            urgency: Urgency level
+            urgency: Urgency level (must match URGENCY_SHEET_MAP)
             summary: Email summary
         """
         try:
             if not self.service:
                 raise RuntimeError("Sheets service not initialized. Call authenticate() first.")
             
-            # Prepare row data with category included
-            row_data = [subject, category, urgency, summary]
+            # Get sheet name for urgency
+            sheet_name = URGENCY_SHEET_MAP.get(urgency)
+            if not sheet_name:
+                # Try to find closest match
+                urgency_lower = urgency.lower()
+                for urg, sheet in URGENCY_SHEET_MAP.items():
+                    if urg.lower() in urgency_lower or urgency_lower in urg.lower():
+                        sheet_name = sheet
+                        break
+                if not sheet_name:
+                    logger.warning(f"Unknown urgency '{urgency}', defaulting to 'Modérée'")
+                    sheet_name = 'Modérée'
+            
+            # Prepare row data (without urgency column since it's the sheet name)
+            row_data = [subject, category, summary]
             
             # Find next empty row
-            range_name = f"{TICKETS_SHEET_NAME}!A:A"
+            range_name = f"{sheet_name}!A:A"
             result = self.service.spreadsheets().values().get(
                 spreadsheetId=self.spreadsheet_id,
                 range=range_name
@@ -210,7 +235,7 @@ class SheetsWriter:
             next_row = len(values) + 1
             
             # Write data
-            range_to_update = f"{TICKETS_SHEET_NAME}!A{next_row}:D{next_row}"
+            range_to_update = f"{sheet_name}!A{next_row}:C{next_row}"
             body = {
                 'values': [row_data]
             }
@@ -222,7 +247,7 @@ class SheetsWriter:
                 body=body
             ).execute()
             
-            logger.info(f"Written to {TICKETS_SHEET_NAME}: {subject[:50]}... ({category})")
+            logger.info(f"Written to {sheet_name}: {subject[:50]}... ({category})")
             
         except HttpError as e:
             logger.error(f"Error writing to sheet: {str(e)}")
@@ -233,7 +258,7 @@ class SheetsWriter:
     
     def write_batch(self, results: list):
         """
-        Write multiple results to the tickets sheet.
+        Write multiple results to their respective urgency sheets.
         
         Args:
             results: List of result dictionaries with 'categorie', 'subject', 'urgence', 'synthese'
@@ -246,40 +271,65 @@ class SheetsWriter:
                 logger.warning("No results to write")
                 return
             
-            # Prepare batch data with category included
-            rows_data = []
+            # Group results by urgency
+            by_urgency = {}
             for result in results:
-                rows_data.append([
-                    result.get('subject', ''),
-                    result.get('categorie', 'Support utilisateur'),
-                    result.get('urgence', ''),
-                    result.get('synthese', '')
-                ])
+                urgency = result.get('urgence', 'Modérée')
+                # Normalize urgency to match sheet names
+                urgency_normalized = None
+                urgency_lower = urgency.lower()
+                for urg, sheet in URGENCY_SHEET_MAP.items():
+                    if urg.lower() == urgency_lower or urg.lower() in urgency_lower or urgency_lower in urg.lower():
+                        urgency_normalized = urg
+                        break
+                if not urgency_normalized:
+                    logger.warning(f"Unknown urgency '{urgency}', defaulting to 'Modérée'")
+                    urgency_normalized = 'Modérée'
+                
+                if urgency_normalized not in by_urgency:
+                    by_urgency[urgency_normalized] = []
+                by_urgency[urgency_normalized].append(result)
             
-            # Find next empty row
-            range_name = f"{TICKETS_SHEET_NAME}!A:A"
-            result_get = self.service.spreadsheets().values().get(
-                spreadsheetId=self.spreadsheet_id,
-                range=range_name
-            ).execute()
-            
-            values = result_get.get('values', [])
-            start_row = len(values) + 1
-            
-            # Write batch
-            range_to_update = f"{TICKETS_SHEET_NAME}!A{start_row}:D{start_row + len(rows_data) - 1}"
-            body = {
-                'values': rows_data
-            }
-            
-            self.service.spreadsheets().values().update(
-                spreadsheetId=self.spreadsheet_id,
-                range=range_to_update,
-                valueInputOption='RAW',
-                body=body
-            ).execute()
-            
-            logger.info(f"Written {len(rows_data)} rows to {TICKETS_SHEET_NAME}")
+            # Write each urgency's results to its sheet
+            for urgency, urgency_results in by_urgency.items():
+                sheet_name = URGENCY_SHEET_MAP.get(urgency)
+                if not sheet_name:
+                    logger.warning(f"Unknown urgency '{urgency}', skipping")
+                    continue
+                
+                # Prepare batch data (without urgency column since it's the sheet name)
+                rows_data = []
+                for result in urgency_results:
+                    rows_data.append([
+                        result.get('subject', ''),
+                        result.get('categorie', 'Support utilisateur'),
+                        result.get('synthese', '')
+                    ])
+                
+                # Find next empty row
+                range_name = f"{sheet_name}!A:A"
+                result_get = self.service.spreadsheets().values().get(
+                    spreadsheetId=self.spreadsheet_id,
+                    range=range_name
+                ).execute()
+                
+                values = result_get.get('values', [])
+                start_row = len(values) + 1
+                
+                # Write batch
+                range_to_update = f"{sheet_name}!A{start_row}:C{start_row + len(rows_data) - 1}"
+                body = {
+                    'values': rows_data
+                }
+                
+                self.service.spreadsheets().values().update(
+                    spreadsheetId=self.spreadsheet_id,
+                    range=range_to_update,
+                    valueInputOption='RAW',
+                    body=body
+                ).execute()
+                
+                logger.info(f"Written {len(rows_data)} rows to {sheet_name}")
             
         except HttpError as e:
             logger.error(f"Error writing batch to sheets: {str(e)}")

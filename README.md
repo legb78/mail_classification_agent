@@ -73,7 +73,13 @@ Edit `.env` and fill in:
 
 6. Prepare Google Sheets:
    - Create a Google Sheets spreadsheet
-   - The script will automatically create a sheet named "Tickets" with headers: `Sujet`, `Catégorie`, `Urgence`, `Synthèse`
+   - The script will automatically create 5 sheets organized by urgency level:
+     - `Critique`
+     - `Élevée`
+     - `Modérée`
+     - `Faible`
+     - `Anodine`
+   - Each sheet will have headers: `Sujet`, `Catégorie`, `Synthèse`
    - Copy the spreadsheet ID from the URL (the long string between `/d/` and `/edit`)
 
 ## Usage
@@ -96,7 +102,7 @@ After authorization, tokens will be saved and reused automatically.
    - If `PROCESS_ALL_EMAILS=true`: Reads all emails (read and unread) from inbox
 2. **AI Analysis**: Sends each email (subject + body) to Groq API for analysis
 3. **Classification**: Groq returns category, urgency level, and summary
-4. **Sheet Writing**: Writes all results to a single "Tickets" sheet with columns: Sujet, Catégorie, Urgence, Synthèse
+4. **Sheet Writing**: Writes results to urgency-based sheets (Critique, Élevée, Modérée, Faible, Anodine) with columns: Sujet, Catégorie, Synthèse
 5. **Email Marking**: 
    - Marks processed emails as read only if processing unread emails
    - Skips marking as read when processing all emails (to avoid marking already-read emails)
