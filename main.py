@@ -87,7 +87,7 @@ def main():
             token_file=config['gmail_token_file']
         )
         
-        groq_agent = GroqAgent(api_key=config['groq_api_key'])
+        groq_agent = GroqAgent(api_key=config['groq_api_key'], model="openai/gpt-oss-120b")
         
         sheets_writer = SheetsWriter(
             credentials_file=config['sheets_credentials_file'],

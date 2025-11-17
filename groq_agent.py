@@ -33,7 +33,7 @@ URGENCY_LEVELS = [
 class GroqAgent:
     """Handles Groq API operations for email analysis."""
     
-    def __init__(self, api_key: str, model: str = "openai/gpt-oss-120b"):
+    def __init__(self, api_key: str, model: str = "lama-3.1-70b-versatile"):
         """
         Initialize Groq Agent.
         
