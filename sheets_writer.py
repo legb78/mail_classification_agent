@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 # Google Sheets API scopes
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-# Urgency to sheet name mapping
-URGENCY_SHEET_MAP = {
-    'Critique': 'Critique',
-    'Élevée': 'Élevée',
-    'Modérée': 'Modérée',
-    'Faible': 'Faible',
-    'Anodine': 'Anodine'
+# Category to sheet name mapping
+CATEGORY_SHEET_MAP = {
+    'Technique': 'Technique',
+    'Administratif': 'Administratif',
+    'Accès/Authentification': 'Accès/Authentification',
+    'Support utilisateur': 'Support utilisateur',
+    'Bug/Dysfonctionnement': 'Bug/Dysfonctionnement'
 }
 
 
@@ -102,9 +102,9 @@ class SheetsWriter:
             existing_sheets = [sheet['properties']['title'] for sheet in spreadsheet.get('sheets', [])]
             logger.info(f"Found sheets: {', '.join(existing_sheets)}")
             
-            # Check for required urgency sheets and create missing ones
+            # Check for required category sheets and create missing ones
             missing_sheets = []
-            for urgency, sheet_name in URGENCY_SHEET_MAP.items():
+            for category, sheet_name in CATEGORY_SHEET_MAP.items():
                 if sheet_name not in existing_sheets:
                     missing_sheets.append(sheet_name)
             
@@ -116,7 +116,7 @@ class SheetsWriter:
             # Verify headers exist in each sheet
             self._ensure_headers()
             
-            logger.info("All required urgency sheets verified and ready")
+            logger.info("All required category sheets verified and ready")
             
         except HttpError as e:
             logger.error(f"Error verifying sheets: {str(e)}")
@@ -160,12 +160,12 @@ class SheetsWriter:
     
     def _ensure_headers(self):
         """
-        Ensure that each urgency sheet has the required headers.
+        Ensure that each category sheet has the required headers.
         """
         try:
-            headers = ['Sujet', 'Catégorie', 'Synthèse']
+            headers = ['Sujet', 'Urgence', 'Synthèse']
             
-            for urgency, sheet_name in URGENCY_SHEET_MAP.items():
+            for category, sheet_name in CATEGORY_SHEET_MAP.items():
                 # Check if headers exist
                 range_name = f"{sheet_name}!A1:C1"
                 result = self.service.spreadsheets().values().get(
@@ -196,33 +196,33 @@ class SheetsWriter:
     
     def write_result(self, category: str, subject: str, urgency: str, summary: str):
         """
-        Write a single result row to the appropriate urgency sheet.
+        Write a single result row to the appropriate category sheet.
         
         Args:
-            category: Email category
+            category: Email category (determines which sheet to write to)
             subject: Email subject
-            urgency: Urgency level (must match URGENCY_SHEET_MAP)
+            urgency: Urgency level
             summary: Email summary
         """
         try:
             if not self.service:
                 raise RuntimeError("Sheets service not initialized. Call authenticate() first.")
             
-            # Get sheet name for urgency
-            sheet_name = URGENCY_SHEET_MAP.get(urgency)
+            # Get sheet name for category
+            sheet_name = CATEGORY_SHEET_MAP.get(category)
             if not sheet_name:
                 # Try to find closest match
-                urgency_lower = urgency.lower()
-                for urg, sheet in URGENCY_SHEET_MAP.items():
-                    if urg.lower() in urgency_lower or urgency_lower in urg.lower():
+                category_lower = category.lower()
+                for cat, sheet in CATEGORY_SHEET_MAP.items():
+                    if cat.lower() in category_lower or category_lower in cat.lower():
                         sheet_name = sheet
                         break
                 if not sheet_name:
-                    logger.warning(f"Unknown urgency '{urgency}', defaulting to 'Modérée'")
-                    sheet_name = 'Modérée'
+                    logger.warning(f"Unknown category '{category}', defaulting to 'Support utilisateur'")
+                    sheet_name = 'Support utilisateur'
             
-            # Prepare row data (without urgency column since it's the sheet name)
-            row_data = [subject, category, summary]
+            # Prepare row data (Sujet, Urgence, Synthèse)
+            row_data = [subject, urgency, summary]
             
             # Find next empty row
             range_name = f"{sheet_name}!A:A"
@@ -247,7 +247,7 @@ class SheetsWriter:
                 body=body
             ).execute()
             
-            logger.info(f"Written to {sheet_name}: {subject[:50]}... ({category})")
+            logger.info(f"Written to {sheet_name}: {subject[:50]}... (Urgence: {urgency})")
             
         except HttpError as e:
             logger.error(f"Error writing to sheet: {str(e)}")
@@ -258,7 +258,7 @@ class SheetsWriter:
     
     def write_batch(self, results: list):
         """
-        Write multiple results to their respective urgency sheets.
+        Write multiple results to their respective category sheets.
         
         Args:
             results: List of result dictionaries with 'categorie', 'subject', 'urgence', 'synthese'
@@ -271,38 +271,38 @@ class SheetsWriter:
                 logger.warning("No results to write")
                 return
             
-            # Group results by urgency
-            by_urgency = {}
+            # Group results by category
+            by_category = {}
             for result in results:
-                urgency = result.get('urgence', 'Modérée')
-                # Normalize urgency to match sheet names
-                urgency_normalized = None
-                urgency_lower = urgency.lower()
-                for urg, sheet in URGENCY_SHEET_MAP.items():
-                    if urg.lower() == urgency_lower or urg.lower() in urgency_lower or urgency_lower in urg.lower():
-                        urgency_normalized = urg
+                category = result.get('categorie', 'Support utilisateur')
+                # Normalize category to match sheet names
+                category_normalized = None
+                category_lower = category.lower()
+                for cat, sheet in CATEGORY_SHEET_MAP.items():
+                    if cat.lower() == category_lower or cat.lower() in category_lower or category_lower in cat.lower():
+                        category_normalized = cat
                         break
-                if not urgency_normalized:
-                    logger.warning(f"Unknown urgency '{urgency}', defaulting to 'Modérée'")
-                    urgency_normalized = 'Modérée'
+                if not category_normalized:
+                    logger.warning(f"Unknown category '{category}', defaulting to 'Support utilisateur'")
+                    category_normalized = 'Support utilisateur'
                 
-                if urgency_normalized not in by_urgency:
-                    by_urgency[urgency_normalized] = []
-                by_urgency[urgency_normalized].append(result)
+                if category_normalized not in by_category:
+                    by_category[category_normalized] = []
+                by_category[category_normalized].append(result)
             
-            # Write each urgency's results to its sheet
-            for urgency, urgency_results in by_urgency.items():
-                sheet_name = URGENCY_SHEET_MAP.get(urgency)
+            # Write each category's results to its sheet
+            for category, category_results in by_category.items():
+                sheet_name = CATEGORY_SHEET_MAP.get(category)
                 if not sheet_name:
-                    logger.warning(f"Unknown urgency '{urgency}', skipping")
+                    logger.warning(f"Unknown category '{category}', skipping")
                     continue
                 
-                # Prepare batch data (without urgency column since it's the sheet name)
+                # Prepare batch data (Sujet, Urgence, Synthèse)
                 rows_data = []
-                for result in urgency_results:
+                for result in category_results:
                     rows_data.append([
                         result.get('subject', ''),
-                        result.get('categorie', 'Support utilisateur'),
+                        result.get('urgence', 'Modérée'),
                         result.get('synthese', '')
                     ])
                 

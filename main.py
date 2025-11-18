@@ -40,6 +40,7 @@ def load_config():
     
     config = {
         'groq_api_key': os.getenv('GROQ_API_KEY'),
+        'groq_model': os.getenv('GROQ_MODEL', 'llama-3.1-8b-instant'),
         'gmail_credentials_file': os.getenv('GMAIL_CREDENTIALS_FILE'),
         'gmail_token_file': os.getenv('GMAIL_TOKEN_FILE', 'credentials/gmail_token.json'),
         'sheets_credentials_file': os.getenv('SHEETS_CREDENTIALS_FILE'),
@@ -87,7 +88,7 @@ def main():
             token_file=config['gmail_token_file']
         )
         
-        groq_agent = GroqAgent(api_key=config['groq_api_key'], model="openai/gpt-oss-120b")
+        groq_agent = GroqAgent(api_key=config['groq_api_key'], model=config.get('groq_model', 'llama-3.1-8b-instant'))
         
         sheets_writer = SheetsWriter(
             credentials_file=config['sheets_credentials_file'],

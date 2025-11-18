@@ -13,6 +13,7 @@ from groq import Groq
 logger = logging.getLogger(__name__)
 
 # Category mapping (French to sheet names)
+# Each category will be a separate sheet in Google Sheets
 CATEGORIES = [
     "Technique",
     "Administratif",
@@ -33,13 +34,13 @@ URGENCY_LEVELS = [
 class GroqAgent:
     """Handles Groq API operations for email analysis."""
     
-    def __init__(self, api_key: str, model: str = "lama-3.1-70b-versatile"):
+    def __init__(self, api_key: str, model: str = "qwen/qwen3-32b"):
         """
         Initialize Groq Agent.
         
         Args:
             api_key: Groq API key
-            model: Groq model to use (default: llama-3.1-70b-versatile)
+            model: Groq model to use (default: llama-3.1-8b-instant)
         """
         self.api_key = api_key
         self.model = model
