@@ -7,7 +7,7 @@ Handles Groq API calls for email classification, urgency detection, and summary 
 import json
 import logging
 import time
-from typing import Dict, List, Optional
+from typing import Dict, List
 from groq import Groq
 
 logger = logging.getLogger(__name__)

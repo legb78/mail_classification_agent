@@ -124,7 +124,7 @@ class GmailReader:
             logger.error(f"Unexpected error getting all emails: {str(e)}")
             raise
     
-    def get_unread_emails(self, max_results=100, fallback_to_recent=False):
+    def get_unread_emails(self, max_results=500, fallback_to_recent=False):
         """
         Get list of unread email IDs.
         
