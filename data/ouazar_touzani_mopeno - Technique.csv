@@ -1,0 +1,195 @@
+Sujet,Urgence,Synthèse
+Problème technique avec le serveur de données,Critique,"Ticket concernant: Problème technique avec le serveur de données. Bonjour, nous avons un problème critique avec le serveur de données.
+Il est actuellement hors servi..."
+Panne serveur de messagerie et intranet,Critique,"Ticket concernant: Panne serveur de messagerie et intranet. URGENT : Le serveur de messagerie est hors service depuis 14h30. Aucun
+employé ne peut envoyer ou r..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, le serveur principal de notre entreprise est actuellement
+hors service, ce qui affecte tou..."
+Problème de sécurité sur le serveur principal,Élevée,"Ticket concernant: Problème de sécurité sur le serveur principal. Bonjour, nous avons détecté une faille de sécurité sur notre serveur
+principal qui pourrait potenti..."
+Panne majeure du système de production,Critique,"Ticket concernant: Panne majeure du système de production. Bonjour, nous venons de détecter une panne majeure du système de
+production qui affecte directement..."
+Panne du serveur principal de l'entreprise,Critique,"Ticket concernant: Panne du serveur principal de l'entreprise. Bonjour, nous venons de constater que le serveur principal de
+l'entreprise est en panne. Cela affec..."
+Panne du serveur de messagerie – interruption totale,Critique,"Ticket concernant: Panne du serveur de messagerie – interruption totale. Urgent : Le serveur de messagerie interne est hors service depuis
+15h30. Aucun e‑mail ne passe, ni ..."
+Problème de synchronisation des contacts Outlook,Élevée,"Ticket concernant: Problème de synchronisation des contacts Outlook. Bonjour, depuis le lancement de la dernière mise à jour Office 365,
+mes contacts Outlook ne se sync..."
+Surchauffe du rack serveur 3 – intervention urgente requise,Critique,"Ticket concernant: Surchauffe du rack serveur 3 – intervention urgente requise. URGENT : Le rack serveur 3 dans le data center a atteint une
+température de 85 °C, provoquant une d..."
+Serveur de production hors ligne,Critique,"Ticket concernant: Serveur de production hors ligne. Bonjour,
+
+Le serveur de production (srv-prod-01) est hors ligne depuis 3h30. Les
+équipes de dével..."
+Faille de sécurité sur le site web,Critique,"Ticket concernant: Faille de sécurité sur le site web. Bonjour, nous avons découvert une faille de sécurité sur notre site
+web qui permet à des utilisateu..."
+Problème technique avec le serveur de production,Critique,"Ticket concernant: Problème technique avec le serveur de production. Bonjour, nous expérimentons un problème critique avec notre serveur de
+production. Le serveur est a..."
+Urgent : serveur de messagerie hors service – impact sur l’ensemble de l’entreprise,Critique,"Ticket concernant: Urgent : serveur de messagerie hors service – impact sur l’ensemble de l’entreprise. Bonjour,
+
+À 09h30, le serveur de messagerie Exchange a cessé de répondre. Aucun
+e‑mail ne peut êt..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, le serveur principal de l'entreprise est actuellement hors
+service. Tous les services en l..."
+Panne totale du serveur de messagerie interne,Critique,"Ticket concernant: Panne totale du serveur de messagerie interne. Bonjour,
+Le serveur de messagerie interne est hors service depuis 10h30. Aucun
+e‑mail n'est envoyé..."
+Panne du système de gestion de production,Critique,"Ticket concernant: Panne du système de gestion de production. Bonjour, notre système de gestion de production est actuellement hors
+service, ce qui bloque toute ..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, le serveur principal de l'entreprise est actuellement hors
+service, ce qui bloque toutes l..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, le serveur principal de l'entreprise est actuellement en
+panne. Cela affecte toutes les op..."
+Problème de sécurité avec un ordinateur portable,Élevée,"Ticket concernant: Problème de sécurité avec un ordinateur portable. Bonjour, j'ai constaté que mon ordinateur portable a été infecté par
+un virus. J'ai des information..."
+Panne du serveur de production – indisponibilité totale,Critique,"Ticket concernant: Panne du serveur de production – indisponibilité totale. Urgent : le serveur de production (IP 10.0.1.5) est hors ligne depuis
+2h30. Toutes les applications..."
+Demande d’assistance pour l’installation de la nouvelle version de l’application mobile,Élevée,"Ticket concernant: Demande d’assistance pour l’installation de la nouvelle version de l’application mobile. Bonjour,
+
+Plusieurs utilisateurs rencontrent des plantages lors de
+l’installation de la mise à jo..."
+Panne majeure du système de gestion des commandes,Critique,"Ticket concernant: Panne majeure du système de gestion des commandes. Bonjour, nous venons de détecter une panne majeure dans notre système
+de gestion des commandes. Le ..."
+Serveur de fichiers hors ligne,Critique,"Ticket concernant: Serveur de fichiers hors ligne. Bonjour,\n\nLe serveur de fichiers partagé (\\srv\\documents) est hors
+ligne depuis ce matin. Aucun..."
+Intranet lent depuis plusieurs jours,Modérée,"Ticket concernant: Intranet lent depuis plusieurs jours. Bonjour,\n\nLe portail intranet est très lent ces derniers jours, ce
+qui ralentit nos opérations qu..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, notre serveur principal est actuellement hors service, ce qui
+affecte toutes les opération..."
+Incident majeur : perte de données sur le serveur de sauvegarde,Critique,"Ticket concernant: Incident majeur : perte de données sur le serveur de sauvegarde. Bonjour,
+
+Suite à la mise à jour du logiciel de sauvegarde, nous avons constaté
+la perte de plusi..."
+Panne du serveur de base de données principale,Critique,"Ticket concernant: Panne du serveur de base de données principale. Bonjour,
+
+Le serveur de base de données principale (DB01) est hors ligne depuis
+3h30. Les requête..."
+Problème de serveur - Impact sur la production,Critique,"Ticket concernant: Problème de serveur - Impact sur la production. Bonjour, nous rencontrons un problème critique avec l'un de nos
+serveurs. La production est actuell..."
+Blocage du CRM – besoin d'assistance immédiate,Critique,"Ticket concernant: Blocage du CRM – besoin d'assistance immédiate. Bonjour, je ne peux plus accéder au CRM depuis 3 heures. L'application
+se ferme brutalement à chaqu..."
+Panne majeure du serveur principal,Critique,"Ticket concernant: Panne majeure du serveur principal. Bonjour, nous venons de constater une panne majeure du serveur
+principal de l'entreprise. Tous les ..."
+Panne majeure du système de gestion de production,Critique,"Ticket concernant: Panne majeure du système de gestion de production. Bonjour, nous avons une situation critique en cours. Le système de
+gestion de production est tombé ..."
+Panne critique du serveur principal,Critique,"Ticket concernant: Panne critique du serveur principal. URGENT - Notre serveur principal est actuellement hors service, ce qui
+affecte toutes les opération..."
+Attaque de sécurité en cours : données sensibles exposées,Critique,"Ticket concernant: Attaque de sécurité en cours : données sensibles exposées. Bonjour, nous sommes actuellement sous attaque de la part d’un pirate
+informatique. Des données sen..."
+Problème de serveur : impossibilité d’accéder aux données,Critique,"Ticket concernant: Problème de serveur : impossibilité d’accéder aux données. Bonjour, nous rencontrons un problème critique avec notre serveur de
+données. Plusieurs membres de ..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, nous venons de subir une panne du serveur principal de notre
+système de gestion. Tous les ..."
+"Panne serveur de production, indisponibilité totale",Critique,"Ticket concernant: Panne serveur de production, indisponibilité totale. URGENT: Le serveur de production hébergeant l’application client est
+hors service depuis 14h30. Tou..."
+Urgent : panne du serveur de messagerie interne,Critique,"Ticket concernant: Urgent : panne du serveur de messagerie interne. Bonjour,
+
+Le serveur de messagerie interne est hors service depuis 2h30. Aucun
+e‑mail ne passe, n..."
+Attaque de sécurité en cours contre nos serveurs,Critique,"Ticket concernant: Attaque de sécurité en cours contre nos serveurs. Bonjour, nous avons détecté une attaque de sécurité en cours contre
+nos serveurs. Les attaquants te..."
+"Panne du serveur de messagerie, impact sur l'ensemble de l'entreprise",Critique,"Ticket concernant: Panne du serveur de messagerie, impact sur l'ensemble de l'entreprise. Bonjour,
+Le serveur de messagerie Exchange est hors service depuis 2h, aucun
+e‑mail ne passe.
+Cel..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, nous venons de subir une panne du serveur principal qui
+héberge nos données critiques. Tou..."
+Problème de serveur : impossibilité d'accéder aux données,Élevée,"Ticket concernant: Problème de serveur : impossibilité d'accéder aux données. Bonjour, nous rencontrons un problème grave avec notre serveur de
+données. Depuis ce matin, nous ne..."
+Panne du serveur principal de production,Élevée,"Ticket concernant: Panne du serveur principal de production. Bonjour, le serveur principal de production est actuellement hors
+service, ce qui affecte toutes le..."
+Panne du serveur de production – impact sur les ventes en ligne,Critique,"Ticket concernant: Panne du serveur de production – impact sur les ventes en ligne. Bonjour, le serveur de production (IP 192.168.10.5) est hors service
+depuis 2 heures. Les clients n..."
+Demande de support : problème de synchronisation des contacts Outlook,Modérée,"Ticket concernant: Demande de support : problème de synchronisation des contacts Outlook. Bonjour, je rencontre un souci avec Outlook : les contacts que je crée
+sur mon téléphone ne se sync..."
+Arrêt du serveur de production : intervention urgente requise,Critique,"Ticket concernant: Arrêt du serveur de production : intervention urgente requise. Bonjour, le serveur de production 'srv-prod-01' est hors ligne depuis
+2h30. Les applications critiq..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, nous venons de détecter une panne du serveur principal qui
+héberge nos données critiques. ..."
+Problème technique avec le serveur de messagerie,Élevée,"Ticket concernant: Problème technique avec le serveur de messagerie. Bonjour, nous rencontrons actuellement des difficultés avec notre
+serveur de messagerie. De nombreu..."
+Panne du serveur de messagerie interne,Modérée,"Ticket concernant: Panne du serveur de messagerie interne. Bonjour,
+
+Depuis hier soir, aucun utilisateur ne reçoit de mails internes. Les
+boîtes de réceptio..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, le serveur principal de l'entreprise est actuellement hors
+service, ce qui entraîne une in..."
+Panne du serveur de production,Critique,"Ticket concernant: Panne du serveur de production. URGENT : Panne du serveur de production. Le serveur principal de notre
+application e-commerce (IP 1..."
+Panne majeure du serveur principal,Critique,"Ticket concernant: Panne majeure du serveur principal. URGENT - Le serveur principal est actuellement hors service, ce qui
+affecte toutes les opérations d..."
+Problème de connexion au système de gestion de projet,Critique,"Ticket concernant: Problème de connexion au système de gestion de projet. Bonjour, j'ai un problème urgent avec la connexion au système de
+gestion de projet. Plusieurs membr..."
+Serveur de fichiers indisponible,Critique,"Ticket concernant: Serveur de fichiers indisponible. Bonjour,
+
+Le serveur de fichiers partagé (srv-files) est hors ligne depuis 3h.
+Aucun utilisateur ..."
+Panne serveur de production – arrêt complet,Critique,"Ticket concernant: Panne serveur de production – arrêt complet. Urgent : Le serveur de production hébergeant notre plateforme
+e-commerce est hors service depuis 2h..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, nous sommes actuellement confrontés à une situation critique.
+Le serveur principal de l'en..."
+Problème de mise en page sur le rapport annuel,Modérée,"Ticket concernant: Problème de mise en page sur le rapport annuel. Bonjour,
+
+Lors de l'impression du rapport annuel 2023, la mise en page du
+chapitre 4 est décalée,..."
+Panne du serveur de messagerie interne,Critique,"Ticket concernant: Panne du serveur de messagerie interne. URGENT : Le serveur de messagerie interne est hors service depuis
+2h30. Aucun e-mail ne passe, et l..."
+Panne du serveur de messagerie interne,Élevée,"Ticket concernant: Panne du serveur de messagerie interne. Bonjour,\n\nLe serveur de messagerie interne (mail.office.local) est
+hors service depuis 14h30. Auc..."
+Panne du serveur principal de l'entreprise,Critique,"Ticket concernant: Panne du serveur principal de l'entreprise. Bonjour, le serveur principal de l'entreprise est actuellement hors
+service, ce qui entraîne une in..."
+Panne du système de gestion de production,Élevée,"Ticket concernant: Panne du système de gestion de production. Bonjour, nous avons une urgence majeure. Le système de gestion de
+production est actuellement hors ..."
+Panne du serveur de messagerie interne,Élevée,"Ticket concernant: Panne du serveur de messagerie interne. Bonjour,
+
+Le serveur de messagerie interne est hors service depuis 14h. Aucun
+e-mail ne passe, ce..."
+Incident critique : perte de données sur le serveur de sauvegarde,Critique,"Ticket concernant: Incident critique : perte de données sur le serveur de sauvegarde. Bonjour,
+
+Nous avons constaté une perte de données sur le serveur de sauvegarde
+après la mise à j..."
+Arrêt du serveur de production - impact sur plusieurs services,Critique,"Ticket concernant: Arrêt du serveur de production - impact sur plusieurs services. Bonjour,
+
+Le serveur de production (srv-prod-01) est hors ligne depuis 14h30.
+Les équipes de fact..."
+Panne du serveur de messagerie interne,Critique,"Ticket concernant: Panne du serveur de messagerie interne. URGENT : Le serveur de messagerie interne est hors service depuis
+3h30. Aucun e‑mail n’est envoyé n..."
+Incident critique : perte de données sur le serveur de sauvegarde,Critique,"Ticket concernant: Incident critique : perte de données sur le serveur de sauvegarde. Bonjour,
+
+Nous avons constaté une perte de données sur le serveur de sauvegarde
+(srv-backup-01) a..."
+Panne du serveur de messagerie interne,Critique,"Ticket concernant: Panne du serveur de messagerie interne. Bonjour,
+
+Le serveur de messagerie interne (mail.intranet.local) est hors
+service depuis 14h. Auc..."
+Panne du serveur principal,Critique,"Ticket concernant: Panne du serveur principal. Bonjour, nous avons une situation critique : le serveur principal de
+l'entreprise est actuellement ..."
+Retard dans la réception des emails du service X,Modérée,"Ticket concernant: Retard dans la réception des emails du service X. Bonjour,
+
+Depuis hier, je ne reçois plus les emails du service X, ce qui
+ralentit la coordination..."
+Panne du système de gestion de production,Critique,"Ticket concernant: Panne du système de gestion de production. Bonjour, nous sommes confrontés à une situation critique. Le système
+de gestion de production est a..."
+Interruption totale du service de messagerie pour l’ensemble du siège,Critique,"Ticket concernant: Interruption totale du service de messagerie pour l’ensemble du siège. URGENT
+
+Le service de messagerie interne (Exchange) est complètement hors
+service depuis 08:15 h...."
+Application mobile ne se synchronise pas avec le serveur,Critique,"Ticket concernant: Application mobile ne se synchronise pas avec le serveur. Bonjour, l’application mobile de suivi de commandes ne se synchronise
+plus avec le serveur après la..."
+Panne du serveur de production - Service de facturation indisponible,Critique,"Ticket concernant: Panne du serveur de production - Service de facturation indisponible. Urgent : Le serveur de production hébergeant le service de facturation
+est hors ligne depuis 2h30. ..."
+Demande de fournitures de bureau,Modérée,"Ticket concernant: Demande de fournitures de bureau. Bonjour,
+
+Je souhaiterais commander 10 cartouches d’encre pour l’imprimante du
+bureau de la régio..."
+Urgent : Perte de données sur le serveur de sauvegarde,Critique,"Ticket concernant: Urgent : Perte de données sur le serveur de sauvegarde. Bonjour, après la dernière mise à jour du système, nous avons constaté
+une perte de données sur le ..."
+Panne du serveur de messagerie interne,Critique,"Ticket concernant: Panne du serveur de messagerie interne. Bonjour, le serveur de messagerie interne est hors service depuis 3
+heures. Aucun e-mail ne passe, ..."
+Panne majeure du système de gestion de production,Élevée,"Ticket concernant: Panne majeure du système de gestion de production. Bonjour, nous venons de constater une panne majeure du système de
+gestion de production. La product..."
+Panne du système de gestion des commandes,Élevée,"Ticket concernant: Panne du système de gestion des commandes. Bonjour, notre système de gestion des commandes est actuellement hors
+service, ce qui bloque toutes..."
+Problème technique informatique : serveur de messagerie indisponible,Critique,"Ticket concernant: Problème technique informatique : serveur de messagerie indisponible. Bonjour,
+Depuis ce matin, le serveur de messagerie interne est hors service.
+Aucun e‑mail ne passe..."
